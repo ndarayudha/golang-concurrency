@@ -75,7 +75,7 @@ func main() {
 				if strings.Contains(path, "node_modules") || strings.Contains(path, "vendor") {
 					return nil
 				}
-			
+
 				ch := make(chan Result)
 				jobs <- Work{file: path, pattern: rex, result: ch}
 				allResults <- ch

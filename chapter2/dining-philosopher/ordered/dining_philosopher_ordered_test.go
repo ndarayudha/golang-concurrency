@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 func philosopher(index int, firstFork, secondFork *sync.Mutex) {
 	for {
 		// Think for some time

@@ -69,33 +69,33 @@ func dispatchWorkers(db *sql.DB, jobs <-chan []interface{}, wg *sync.WaitGroup) 
 func doTheJob(workerIndex, counter int, db *sql.DB, values []interface{}) {
 	maxRetries := 5 // Maximum number of retries
 
-    for retry := 0; retry < maxRetries; retry++ {
-        conn, err := db.Conn(context.Background())
-        if err != nil {
-            log.Printf("Error creating database connection: %v", err)
-            continue // Retry the operation
-        }
+	for retry := 0; retry < maxRetries; retry++ {
+		conn, err := db.Conn(context.Background())
+		if err != nil {
+			log.Printf("Error creating database connection: %v", err)
+			continue // Retry the operation
+		}
 
-        query := fmt.Sprintf("INSERT INTO domain (%s) VALUES (%s)",
-            strings.Join(dataHeaders, ","),
-            strings.Join(generateQuestionsMark(len(dataHeaders)), ","),
-        )
+		query := fmt.Sprintf("INSERT INTO domain (%s) VALUES (%s)",
+			strings.Join(dataHeaders, ","),
+			strings.Join(generateQuestionsMark(len(dataHeaders)), ","),
+		)
 
-        _, err = conn.ExecContext(context.Background(), query, values...)
-        conn.Close()
+		_, err = conn.ExecContext(context.Background(), query, values...)
+		conn.Close()
 
-        if err != nil {
-            log.Printf("Error executing database query: %v", err)
-            log.Printf("Retrying %d ...", retry)
-            continue // Retry the operation
-        } else {
-            break // Operation succeeded, exit the retry loop
-        }
-    }
+		if err != nil {
+			log.Printf("Error executing database query: %v", err)
+			log.Printf("Retrying %d ...", retry)
+			continue // Retry the operation
+		} else {
+			break // Operation succeeded, exit the retry loop
+		}
+	}
 
-    if counter%100 == 0 {
-        log.Println("=> worker", workerIndex, "inserted", counter, "data")
-    }
+	if counter%100 == 0 {
+		log.Println("=> worker", workerIndex, "inserted", counter, "data")
+	}
 }
 
 func insertData(db *sql.DB, values []interface{}) error {
